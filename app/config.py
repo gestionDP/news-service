@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     # RSS ingestion limits per source
     TECH_RSS_LIMIT_PER_SOURCE: int = 5
-    REAL_ESTATE_RSS_LIMIT_PER_SOURCE: int = 5
+    REAL_ESTATE_RSS_LIMIT_PER_SOURCE: int = 10
 
     # IG generation
     AUTO_GENERATE_IG_AFTER_INGEST: bool = True

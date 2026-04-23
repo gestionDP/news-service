@@ -17,6 +17,7 @@
             <input type="hidden" name="tab" value="{{ tab }}">
             <input type="hidden" name="category" value="{{ category_filter }}">
             <input type="hidden" name="only_without_draft" value="{{ '1' if only_without_draft else '' }}">
+            <input type="hidden" name="order_by" value="{{ order_by }}">
             <input type="text" name="q" placeholder="Buscar…" value="{{ q }}" onchange="this.form.submit()">
           </form>
         </div>
@@ -36,6 +37,13 @@
                     {% endfor %}
                   </select>
                 </div>
+                <div class="filter-row">
+                  <label>Ordenar por</label>
+                  <select name="order_by">
+                    <option value="published_at" {% if order_by == 'published_at' %}selected{% endif %}>Más recientes</option>
+                    <option value="relevance_score" {% if order_by == 'relevance_score' %}selected{% endif %}>Más relevantes</option>
+                  </select>
+                </div>
                 <div class="filter-row toggle-row">
                   <input type="checkbox" name="only_without_draft" id="onlyNoDraft" value="1" {% if only_without_draft %}checked{% endif %}>
                   <label for="onlyNoDraft" style="margin:0">Solo sin borrador</label>
@@ -49,9 +57,9 @@
       </div>
       <div class="subheader">
         <nav class="tabs">
-          <a href="/ui/{{ brand }}?tab=inbox{% if q %}&q={{ q }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if only_without_draft %}&only_without_draft=1{% endif %}" class="tab {% if tab == 'inbox' %}active{% endif %}">Bandeja</a>
-          <a href="/ui/{{ brand }}?tab=drafts{% if q %}&q={{ q }}{% endif %}" class="tab {% if tab == 'drafts' %}active{% endif %}">Borradores</a>
-          <a href="/ui/{{ brand }}?tab=approved{% if q %}&q={{ q }}{% endif %}" class="tab {% if tab == 'approved' %}active{% endif %}">Aprobados</a>
+          <a href="/ui/{{ brand }}?tab=inbox{% if q %}&q={{ q }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if only_without_draft %}&only_without_draft=1{% endif %}{% if order_by != 'published_at' %}&order_by={{ order_by }}{% endif %}" class="tab {% if tab == 'inbox' %}active{% endif %}">Bandeja</a>
+          <a href="/ui/{{ brand }}?tab=drafts{% if q %}&q={{ q }}{% endif %}{% if order_by != 'published_at' %}&order_by={{ order_by }}{% endif %}" class="tab {% if tab == 'drafts' %}active{% endif %}">Borradores</a>
+          <a href="/ui/{{ brand }}?tab=approved{% if q %}&q={{ q }}{% endif %}{% if order_by != 'published_at' %}&order_by={{ order_by }}{% endif %}" class="tab {% if tab == 'approved' %}active{% endif %}">Aprobados</a>
         </nav>
       </div>
     </div>
@@ -65,7 +73,7 @@
         <li class="news-row">
           <a href="/ui/{{ brand }}/news/{{ item.news.id }}" class="row-main">
             <div class="meta-line">
-              {% if item.news.relevance_score %}<span>{{ item.news.relevance_score }}</span>{% endif %}
+              {% if item.news.relevance_score %}<span class="badge {% if item.news.relevance_score >= 80 %}badge-high{% elif item.news.relevance_score >= 50 %}badge-mid{% else %}badge-low{% endif %}" title="Relevancia: {{ item.news.relevance_score }}/100">{{ item.news.relevance_score }}</span>{% endif %}
               <span class="badge badge-cat">{{ item.news.category[:12] }}{% if item.news.category|length > 12 %}…{% endif %}</span>
               <span>{{ item.news.source }}</span>
               <span class="date-relative" title="{{ item.news.published_at.strftime('%Y-%m-%d %H:%M') if item.news.published_at else '' }}">{{ item.news.published_at.strftime('%Y-%m-%d') if item.news.published_at else '' }}</span>
@@ -93,7 +101,7 @@
 <div class="modal-overlay hidden" id="generateModal">
   <div class="modal">
     <h3>Generar más noticias</h3>
-    <p>Se ingestarán fuentes RSS (máx. 5 por fuente). Se generará <strong>1 borrador IG por noticia nueva</strong>. ¿Continuar?</p>
+    <p>Se ingestarán fuentes RSS (máx. 10 por fuente). Se generará <strong>1 borrador IG por noticia nueva</strong>. ¿Continuar?</p>
     <div class="modal-actions">
       <button type="button" class="btn" onclick="closeGenerateModal()">Cancelar</button>
       <button type="button" class="btn-generate-more" onclick="confirmGenerate()">Continuar</button>

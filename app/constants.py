@@ -227,12 +227,34 @@ DENY_KEYWORDS: Final[list[str]] = [
     "coche", "coches", "robo", "robos", "detenidos", "detenido", "policía", "policia",
     "fútbol", "futbol", "deporte", "deportes", "partido", "gol", "liga",
     "sanidad", "hospital", "covid", "vacuna", "elecciones", "político", "politico",
+    # Lifestyle / soft living
+    "receta", "mascota", "mascotas", "perro", "gato", "vacaciones", "turismo",
+    "feng shui", "colores para", "pintar", "cortinas", "alfombra",
+    "mudanza", "limpiar", "limpieza", "organizar tu", "orden en casa",
+    # Generic clickbait
+    "truco", "trucos", "secreto", "secretos", "no creerás", "te sorprenderá",
+    "increíble", "increible", "viral",
+    # Weather / misc
+    "tiempo", "lluvia", "tormenta", "ola de calor", "incendio",
 ]
 
 ALLOW_KEYWORDS: Final[list[str]] = [
     # Market & prices
-    "vivienda", "inmueble", "inmobiliario", "compraventa", "tasación", "tasacion",
-    "precio", "precios", "obra nueva", "visados", "promotor", "promotora",
+    "vivienda", "inmueble", "inmobiliario", "compraventa", "compraventas",
+    "tasación", "tasacion", "precio", "precios", "obra nueva", "visados",
+    "promotor", "promotora", "mercado inmobiliario", "mercado de la vivienda",
+    "mercado residencial", "transacciones",
+    # Records / trends (what Dani likes)
+    "récord", "record", "máximo histórico", "maximo historico",
+    "demanda", "oferta", "índice de precios", "indice de precios",
+    "ine", "registradores", "notariado", "colegio de registradores",
+    # Rustic / rural properties
+    "finca", "fincas", "rústica", "rustica", "rústicas", "rusticas",
+    "rural", "terreno", "parcela",
+    # Tasadoras / valoración
+    "valoración", "valoracion", "tasadora", "tasadoras", "tinsa", "ibertasa",
+    "sociedad de tasación", "sociedad de tasacion", "euroval", "gesvalt", "atasa",
+    "uve valoraciones", "valor de mercado", "valor catastral",
     # Rent
     "alquiler", "renta", "arrendamiento",
     # Financing
@@ -241,28 +263,48 @@ ALLOW_KEYWORDS: Final[list[str]] = [
     "ley de vivienda", "regulación", "regulacion", "topes", "licencia", "licencias",
     "planeamiento", "urbanismo", "suelo", "fiscalidad", "impuestos", "boe", "subasta", "subastas",
     # Construction
-    "construcción", "construccion", "arquitect", "cscae", "observatorio 2030",
+    "construcción", "construccion", "arquitect", "cscae",
     # Investment
-    "fondo", "fondos", "socimi", "cartera", "yield", "cap rate", "rentabilidad",
-    "inversión", "inversion", "inversiones inmobiliarias",
+    "fondo", "fondos", "socimi", "cartera", "carteras", "yield", "cap rate",
+    "rentabilidad", "inversión", "inversion", "inversiones inmobiliarias",
+    "adquisición", "adquisicion", "desinversión", "desinversion", "portfolio",
 ]
 
 # Optional: category hints to strengthen classification (use in classifier).
 CATEGORY_HINTS: Final[dict[str, list[str]]] = {
-    AltharaCategoryV2.PRECIOS_VIVIENDA: ["precio", "precios", "tasación", "tasacion", "índice", "indice"],
-    AltharaCategoryV2.MERCADO_COMPRAVENTA: ["compraventa", "ventas", "operaciones", "transacciones"],
-    AltharaCategoryV2.ALQUILER_RESIDENCIAL: ["alquiler", "renta", "arrendamiento"],
-    AltharaCategoryV2.HIPOTECAS_Y_CREDITO: ["hipoteca", "euríbor", "euribor", "crédito", "credito", "tipo de interés"],
-    AltharaCategoryV2.REGULACION_VIVIENDA: ["ley", "regulación", "regulacion", "topes", "fiscalidad", "impuestos"],
+    AltharaCategoryV2.PRECIOS_VIVIENDA: [
+        "precio", "precios", "tasación", "tasacion", "índice", "indice",
+        "valoración", "valoracion", "tasadora", "tinsa", "ibertasa", "euroval",
+        "gesvalt", "atasa", "uve valoraciones", "valor de mercado", "valor catastral",
+        "récord", "record", "máximo", "maximo", "mínimo", "minimo",
+        "sube", "baja", "encarece", "abarata", "dispara", "más caro", "mas caro",
+        "euros/m", "€/m", "metro cuadrado", "m²", "por metro",
+        "ine", "registradores", "notariado", "colegio de registradores",
+        "estadística", "estadistica", "índice de precios", "indice de precios",
+    ],
+    AltharaCategoryV2.MERCADO_COMPRAVENTA: [
+        "compraventa", "compraventas", "ventas", "transacciones",
+        "demanda", "oferta", "mercado inmobiliario", "mercado de la vivienda",
+        "mercado residencial", "actividad inmobiliaria",
+        "finca", "fincas", "rústica", "rustica", "parcela", "terreno", "rural",
+    ],
+    AltharaCategoryV2.ALQUILER_RESIDENCIAL: ["alquiler", "renta", "arrendamiento", "inquilino"],
+    AltharaCategoryV2.HIPOTECAS_Y_CREDITO: ["hipoteca", "hipotecas", "euríbor", "euribor", "crédito", "credito", "tipo de interés", "tipo fijo", "tipo variable"],
+    AltharaCategoryV2.REGULACION_VIVIENDA: ["ley", "regulación", "regulacion", "topes", "fiscalidad", "impuestos", "ley de vivienda"],
     AltharaCategoryV2.URBANISMO_Y_PLANEAMIENTO: ["urbanismo", "planeamiento", "licencia", "licencias", "suelo"],
     AltharaCategoryV2.BOE_SUBASTAS: ["boe", "subasta", "subastas"],
     AltharaCategoryV2.CONSTRUCCION_Y_COSTES: ["construcción", "construccion", "materiales", "costes", "obra nueva", "plazos"],
     AltharaCategoryV2.INDUSTRIALIZACION_MODULAR: ["modular", "industrialización", "industrializacion", "offsite"],
-    AltharaCategoryV2.INVERSION_INSTITUCIONAL: ["fondo", "fondos", "socimi", "yield", "cap rate", "rentabilidad"],
+    AltharaCategoryV2.INVERSION_INSTITUCIONAL: [
+        "fondo", "fondos", "socimi", "yield", "cap rate", "rentabilidad",
+        "inversión", "inversion", "inversiones inmobiliarias",
+        "adquisición", "adquisicion", "desinversión", "desinversion", "portfolio",
+    ],
     AltharaCategoryV2.OPERACIONES_CORPORATIVAS: ["cartera", "carteras", "adquiere", "compra", "venta", "joint venture", "m&a"],
     AltharaCategoryV2.GRANDES_TENEDORES: ["gran tenedor", "grandes tenedores"],
     AltharaCategoryV2.DESAHUCIOS_Y_VULNERABILIDAD: ["desahucio", "desahucios", "vulnerabilidad"],
     AltharaCategoryV2.OKUPACION_Y_SEGURIDAD_JURIDICA: ["okupa", "okupas", "okupación", "okupacion"],
+    AltharaCategoryV2.OFERTA_Y_STOCK: ["obra nueva", "visados", "stock", "suelo disponible", "promoción", "promocion", "promotora"],
 }
 
 
@@ -278,7 +320,8 @@ SUGGESTED_TAGS: Final[dict[str, list[str]]] = {
     "obra_nueva": ["obra nueva", "visados"],
     "suelo": ["suelo"],
     # Prices
-    "tasacion": ["tasación", "tasacion"],
+    "tasacion": ["tasación", "tasacion", "tasadora", "tasadoras", "tinsa", "ibertasa", "euroval", "gesvalt", "atasa", "uve valoraciones"],
+    "valoracion": ["valoración", "valoracion", "valor de mercado", "valor catastral", "homologación", "homologacion"],
     "descuento": ["descuento"],
     "tension_precios": ["tensión", "tension", "presión", "presion"],
     # Financing

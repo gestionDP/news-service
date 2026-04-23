@@ -22,19 +22,32 @@ from app.constants import (
     ALLOW_KEYWORDS,
     STRICT_REQUIRE_ALLOW,
     CATEGORY_HINTS,
+    CATEGORY_PRIORITY_V2,
 )
 
 
 RSS_SOURCES = [
+    # ── Prensa económica (alta calidad, noticias de mercado) ──────────────
     {"name": "Expansion Inmobiliario", "url": "https://e00-expansion.uecdn.es/rss/inmobiliario.xml", "default_category": AltharaCategoryV2.SECTOR_INMOBILIARIO, "source": "Expansion"},
     {"name": "Cinco Días - Economía Inmobiliaria", "url": "https://cincodias.elpais.com/rss/act/economia_inmobiliaria/", "default_category": AltharaCategoryV2.SECTOR_INMOBILIARIO, "source": "Cinco Días"},
     {"name": "El Economista - Vivienda", "url": "https://www.eleconomista.es/rss/rss-vivienda.php", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "El Economista"},
+    {"name": "El Confidencial Vivienda", "url": "https://www.elconfidencial.com/rss/vivienda/", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "El Confidencial"},
+    # ── Portales inmobiliarios (datos de mercado, tendencias) ─────────────
     {"name": "Idealista News", "url": "https://www.idealista.com/news/rss/v2/latest-news.xml", "default_category": AltharaCategoryV2.SECTOR_INMOBILIARIO, "source": "Idealista"},
-    {"name": "BOE Subastas", "url": "https://subastas.boe.es/rss.php", "default_category": AltharaCategoryV2.BOE_SUBASTAS, "source": "BOE"},
-    {"name": "BOE General", "url": "https://www.boe.es/diario_boe/xml.php?id=BOE-S", "default_category": AltharaCategoryV2.REGULACION_VIVIENDA, "source": "BOE"},
+    {"name": "Fotocasa Blog", "url": "https://www.fotocasa.es/blog/feed/", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "Fotocasa"},
+    {"name": "pisos.com Blog", "url": "https://www.pisos.com/blog/feed/", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "pisos.com"},
+    # ── Inversión profesional ─────────────────────────────────────────────
+    {"name": "Brainsre News", "url": "https://brainsre.news/feed/", "default_category": AltharaCategoryV2.INVERSION_INSTITUCIONAL, "source": "Brainsre"},
+    {"name": "EjePrime", "url": "https://www.ejeprime.com/feed/", "default_category": AltharaCategoryV2.INVERSION_INSTITUCIONAL, "source": "EjePrime"},
     {"name": "Observatorio Inmobiliario", "url": "https://www.observatorioinmobiliario.es/rss/", "default_category": AltharaCategoryV2.SECTOR_INMOBILIARIO, "source": "Observatorio Inmobiliario"},
-    {"name": "Interempresas Construcción", "url": "https://www.interempresas.net/construccion/RSS/", "default_category": AltharaCategoryV2.CONSTRUCCION_Y_COSTES, "source": "Interempresas"},
-    # Última Hora removed: general newspaper (bikes, crime, etc.) - not sector-specific
+    # ── BOE (solo subastas, quitamos BOE General — demasiado ruido) ───────
+    {"name": "BOE Subastas", "url": "https://subastas.boe.es/rss.php", "default_category": AltharaCategoryV2.BOE_SUBASTAS, "source": "BOE"},
+    # ── Tasadoras (datos de precios y valoración) ─────────────────────────
+    {"name": "Tinsa Blog", "url": "https://www.tinsa.es/blog/feed/", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "Tinsa"},
+    {"name": "Tinsa Servicio de Estudios", "url": "https://www.tinsa.es/servicio-de-estudios/feed/", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "Tinsa"},
+    {"name": "ST Sociedad de Tasación", "url": "https://www.st-tasacion.es/informe-de-tendencias/feed/", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "Sociedad de Tasación"},
+    {"name": "Euroval Blog", "url": "https://www.euroval.com/blog/feed/", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "Euroval"},
+    {"name": "Gesvalt Noticias", "url": "https://gesvalt.es/noticias/feed/", "default_category": AltharaCategoryV2.PRECIOS_VIVIENDA, "source": "Gesvalt"},
 ]
 
 
@@ -120,6 +133,65 @@ def _categorize_althara_v2(title: str, summary: Optional[str] = None) -> str:
             best_score = score
             best_cat = category
     return best_cat
+
+
+# ── Relevance scoring ─────────────────────────────────────────────────────────
+# Prioritises market/pricing/investment news (what Dani/editorial wants).
+# Score 0-100; stored in News.relevance_score and used for UI ordering.
+
+_HIGH_VALUE_KEYWORDS: list[str] = [
+    # Precios y récords
+    "precio", "precios", "récord", "record", "máximo", "maximo", "mínimo", "minimo",
+    "sube", "baja", "aumenta", "cae", "crece", "dispara", "encarece", "abarata",
+    "más caro", "mas caro", "más barato", "mas barato",
+    # Compraventa y transacciones
+    "compraventa", "compraventas", "transacciones", "ventas", "compras",
+    # Inversión
+    "inversión", "inversion", "fondo", "fondos", "socimi", "rentabilidad", "yield",
+    "cartera", "carteras", "adquisición", "adquisicion",
+    # Mercado y datos
+    "mercado inmobiliario", "mercado de la vivienda", "mercado residencial",
+    "ine", "registradores", "notariado", "colegio de registradores",
+    "índice de precios", "indice de precios", "estadística", "estadistica",
+    # Hipotecas y financiación
+    "hipoteca", "hipotecas", "euríbor", "euribor",
+    # Fincas rústicas / terreno (Dani liked this)
+    "finca", "fincas", "rústica", "rustica", "rústicas", "rusticas",
+    "parcela", "terreno", "rural",
+    # €/m²
+    "euros/m", "€/m", "metro cuadrado", "m²",
+]
+
+_PENALTY_CATEGORIES = {
+    AltharaCategoryV2.DESAHUCIOS_Y_VULNERABILIDAD,
+    AltharaCategoryV2.OKUPACION_Y_SEGURIDAD_JURIDICA,
+    AltharaCategoryV2.BOE_SUBASTAS,
+    AltharaCategoryV2.INDUSTRIALIZACION_MODULAR,
+    AltharaCategoryV2.CONSTRUCCION_Y_COSTES,
+}
+
+
+def _compute_relevance(title: str, summary: Optional[str], category: str) -> int:
+    """Score 0-100.  Higher = more relevant to Althara editorial line."""
+    score = 40  # baseline
+    text = (title + " " + (summary or "")).lower()
+
+    # Keyword boost (up to +40)
+    kw_hits = sum(1 for kw in _HIGH_VALUE_KEYWORDS if kw in text)
+    score += min(kw_hits * 8, 40)
+
+    # Category boost from priority table
+    cat_priority = CATEGORY_PRIORITY_V2.get(category, 30)
+    if cat_priority >= 85:
+        score += 15
+    elif cat_priority >= 70:
+        score += 8
+
+    # Penalty for low-editorial-value categories
+    if category in _PENALTY_CATEGORIES:
+        score -= 20
+
+    return max(0, min(100, score))
 
 
 async def ingest_rss_sources(session: AsyncSession, max_items_per_source: int = 10) -> Dict[str, int]:
@@ -235,6 +307,7 @@ async def ingest_rss_sources(session: AsyncSession, max_items_per_source: int = 
                 existing_news = result.scalar_one_or_none()
                 
                 if existing_news is None:
+                    relevance = _compute_relevance(title, raw_summary, final_category)
                     new_news = News(
                         title=title,
                         source=source_label,
@@ -244,7 +317,8 @@ async def ingest_rss_sources(session: AsyncSession, max_items_per_source: int = 
                         raw_summary=raw_summary,
                         althara_summary=None,
                         tags=None,
-                        used_in_social=False
+                        used_in_social=False,
+                        relevance_score=relevance,
                     )
                     session.add(new_news)
                     inserted_count += 1

@@ -48,6 +48,7 @@ async def ui_portal(
     q: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
     only_without_draft: Optional[bool] = Query(None),
+    order_by: str = Query("published_at", description="published_at | relevance_score"),
     db: AsyncSession = Depends(get_db),
     _=Depends(basic_auth_dependency),
 ):
@@ -72,7 +73,11 @@ async def ui_portal(
         has_draft = exists().where(IGDraft.news_id == News.id)
         query = query.where(~has_draft)
 
-    query = query.order_by(News.published_at.desc()).limit(100)
+    if order_by == "relevance_score":
+        query = query.order_by(News.relevance_score.desc().nullslast(), News.published_at.desc())
+    else:
+        query = query.order_by(News.published_at.desc())
+    query = query.limit(100)
     res = await db.execute(query)
     news_list = res.scalars().unique().all() if tab in ("drafts", "approved") else res.scalars().all()
 
@@ -108,6 +113,7 @@ async def ui_portal(
             "q": request.query_params.get("q", ""),
             "category_filter": request.query_params.get("category", ""),
             "only_without_draft": request.query_params.get("only_without_draft") == "true" or request.query_params.get("only_without_draft") == "1",
+            "order_by": order_by,
         },
     )
 

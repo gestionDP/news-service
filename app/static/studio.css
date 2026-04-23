@@ -229,6 +229,9 @@ a:hover { text-decoration: underline; }
 .badge-approved { background: rgba(0,186,124,0.2); color: var(--success); }
 .badge-published { background: rgba(16,185,129,0.2); color: var(--published); }
 .badge-cat { background: rgba(255,255,255,0.08); color: var(--muted); }
+.badge-high { background: rgba(0,186,124,0.25); color: #00ba7c; }
+.badge-mid { background: rgba(255,173,31,0.2); color: #ffad1f; }
+.badge-low { background: rgba(255,255,255,0.08); color: var(--muted); }
 .empty { color: var(--muted); text-align: center; padding: var(--s32); font-size: 14px; }
 
 /* Toast */
