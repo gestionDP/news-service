@@ -3,7 +3,9 @@ Admin router for managing news ingestion.
 
 NOTE: Idealista does NOT have a news API, so we only use RSS sources.
 """
-from fastapi import APIRouter, Depends, Query
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func, exists
 from app.database import get_db
@@ -214,4 +216,41 @@ async def clean_news_by_domain(
 async def clean_all_news(db: AsyncSession = Depends(get_db)):
     """Alias for DELETE /clean?domain=all - deletes ALL news. WARNING: irreversible."""
     return await clean_news_by_domain(db=db, domain="all")
+
+
+@router.delete("/news/{news_id}", status_code=status.HTTP_200_OK)
+async def delete_single_news(
+    news_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete a single news item by ID.
+
+    Used by the admin UI when an editor decides a specific news item should
+    not appear in the feed (low-quality content, off-topic, duplicate, etc.).
+    The associated IGDraft, if any, cascades with the news row.
+    """
+    stmt = select(News).where(News.id == news_id)
+    result = await db.execute(stmt)
+    news = result.scalar_one_or_none()
+
+    if news is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"message": f"News {news_id} not found", "code": "NEWS_NOT_FOUND"},
+        )
+
+    title = news.title
+    domain = news.domain
+
+    await db.execute(delete(News).where(News.id == news_id))
+    await db.commit()
+
+    return {
+        "status": "ok",
+        "deleted_id": str(news_id),
+        "domain": domain,
+        "title": title,
+        "message": f"News '{title[:60]}' deleted",
+    }
 
