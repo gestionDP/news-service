@@ -47,7 +47,7 @@ body {
 }
 
 h1 { font-size: 22pt; color: #0f3460; border-bottom: 3px solid #0f3460; padding-bottom: 8px; margin-top: 40px; page-break-before: always; }
-h1:first-of-type { page-break-before: avoid; }
+.cover + .wiki-page h1 { page-break-before: avoid; }
 h2 { font-size: 16pt; color: #16213e; border-bottom: 1px solid #dde; padding-bottom: 4px; margin-top: 28px; }
 h3 { font-size: 13pt; color: #1a1a2e; margin-top: 20px; }
 h4 { font-size: 11pt; color: #333; margin-top: 16px; }
