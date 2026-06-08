@@ -21,7 +21,7 @@ def get_ordered_files():
     if os.path.exists(readme_path):
         with open(readme_path, "r", encoding="utf-8") as f:
             for line in f:
-                match = re.search(r'\(\./([\w\-]+\.md)\)', line)
+                match = re.search(r'\((?:\./)?([\w\-]+\.md)\)', line)
                 if match:
                     fname = match.group(1)
                     if fname != "README.md":
