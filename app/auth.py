@@ -33,6 +33,7 @@ async def admin_api_key_dependency(request: Request):
     frontend proxy injects it from NEWS_ADMIN_API_KEY.
     (Audit 2026-06-12: the delete endpoints previously had no auth at all.)
     """
+    import hmac
     if not settings.ADMIN_API_KEY:
         return
     provided = request.headers.get("X-Admin-Api-Key")
