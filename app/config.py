@@ -24,6 +24,12 @@ class Settings(BaseSettings):
     UI_PASS: Optional[str] = None
     INGEST_TOKEN: Optional[str] = None
 
+    # Service-to-service key for destructive admin endpoints (delete/clean).
+    # When unset, those endpoints stay open (backward compatible). Set the
+    # same value as NEWS_ADMIN_API_KEY in the Althara frontend so its proxy
+    # injects the X-Admin-Api-Key header. (Audit 2026-06-12.)
+    ADMIN_API_KEY: Optional[str] = None
+
     # RSS ingestion limits per source
     TECH_RSS_LIMIT_PER_SOURCE: int = 5
     REAL_ESTATE_RSS_LIMIT_PER_SOURCE: int = 10

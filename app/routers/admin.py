@@ -8,6 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, func, exists
+from app.auth import admin_api_key_dependency
 from app.database import get_db
 from app.config import settings
 from app.ingestion.rss_ingestor import ingest_rss_sources
@@ -182,7 +183,7 @@ async def ingest_and_adapt(
     }
 
 
-@router.delete("/clean")
+@router.delete("/clean", dependencies=[Depends(admin_api_key_dependency)])
 async def clean_news_by_domain(
     db: AsyncSession = Depends(get_db),
     domain: str = Query("real_estate", description="Domain to delete: real_estate (Althara) or tech (Oxono). Use 'all' to delete everything."),
@@ -212,13 +213,17 @@ async def clean_news_by_domain(
     }
 
 
-@router.delete("/clean-all")
+@router.delete("/clean-all", dependencies=[Depends(admin_api_key_dependency)])
 async def clean_all_news(db: AsyncSession = Depends(get_db)):
     """Alias for DELETE /clean?domain=all - deletes ALL news. WARNING: irreversible."""
     return await clean_news_by_domain(db=db, domain="all")
 
 
-@router.delete("/news/{news_id}", status_code=status.HTTP_200_OK)
+@router.delete(
+    "/news/{news_id}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(admin_api_key_dependency)],
+)
 async def delete_single_news(
     news_id: UUID,
     db: AsyncSession = Depends(get_db),
