@@ -36,7 +36,7 @@ async def admin_api_key_dependency(request: Request):
     if not settings.ADMIN_API_KEY:
         return
     provided = request.headers.get("X-Admin-Api-Key")
-    if provided != settings.ADMIN_API_KEY:
+    if not hmac.compare_digest(provided or "", settings.ADMIN_API_KEY):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing admin API key",
