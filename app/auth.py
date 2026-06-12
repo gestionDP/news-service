@@ -24,6 +24,7 @@ def _check_basic_auth(authorization: str) -> bool:
 
 
 async def admin_api_key_dependency(request: Request):
+async def admin_api_key_dependency(request: Request):
     """
     Dependency for destructive admin endpoints (delete/clean).
 
